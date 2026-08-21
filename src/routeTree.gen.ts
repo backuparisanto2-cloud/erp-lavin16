@@ -17,6 +17,7 @@ import { Route as FasilitasRouteImport } from './routes/fasilitas'
 import { Route as JurnalRouteImport } from './routes/jurnal'
 import { Route as KelolaRouteImport } from './routes/kelola'
 import { Route as LaporanRouteImport } from './routes/laporan'
+import { Route as NotifikasiRouteImport } from './routes/notifikasi'
 import { Route as PendapatanRouteImport } from './routes/pendapatan'
 import { Route as PengeluaranRouteImport } from './routes/pengeluaran'
 import { Route as PenggunaRouteImport } from './routes/pengguna'
@@ -65,6 +66,11 @@ const LaporanRoute = LaporanRouteImport.update({
   path: '/laporan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NotifikasiRoute = NotifikasiRouteImport.update({
+  id: '/notifikasi',
+  path: '/notifikasi',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PendapatanRoute = PendapatanRouteImport.update({
   id: '/pendapatan',
   path: '/pendapatan',
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/jurnal': typeof JurnalRoute
   '/kelola': typeof KelolaRoute
   '/laporan': typeof LaporanRoute
+  '/notifikasi': typeof NotifikasiRoute
   '/pendapatan': typeof PendapatanRoute
   '/pengeluaran': typeof PengeluaranRoute
   '/pengguna': typeof PenggunaRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByTo {
   '/jurnal': typeof JurnalRoute
   '/kelola': typeof KelolaRoute
   '/laporan': typeof LaporanRoute
+  '/notifikasi': typeof NotifikasiRoute
   '/pendapatan': typeof PendapatanRoute
   '/pengeluaran': typeof PengeluaranRoute
   '/pengguna': typeof PenggunaRoute
@@ -145,6 +153,7 @@ export interface FileRoutesById {
   '/jurnal': typeof JurnalRoute
   '/kelola': typeof KelolaRoute
   '/laporan': typeof LaporanRoute
+  '/notifikasi': typeof NotifikasiRoute
   '/pendapatan': typeof PendapatanRoute
   '/pengeluaran': typeof PengeluaranRoute
   '/pengguna': typeof PenggunaRoute
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/jurnal'
     | '/kelola'
     | '/laporan'
+    | '/notifikasi'
     | '/pendapatan'
     | '/pengeluaran'
     | '/pengguna'
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/jurnal'
     | '/kelola'
     | '/laporan'
+    | '/notifikasi'
     | '/pendapatan'
     | '/pengeluaran'
     | '/pengguna'
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/jurnal'
     | '/kelola'
     | '/laporan'
+    | '/notifikasi'
     | '/pendapatan'
     | '/pengeluaran'
     | '/pengguna'
@@ -216,6 +228,7 @@ export interface RootRouteChildren {
   JurnalRoute: typeof JurnalRoute
   KelolaRoute: typeof KelolaRoute
   LaporanRoute: typeof LaporanRoute
+  NotifikasiRoute: typeof NotifikasiRoute
   PendapatanRoute: typeof PendapatanRoute
   PengeluaranRoute: typeof PengeluaranRoute
   PenggunaRoute: typeof PenggunaRoute
@@ -283,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LaporanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/notifikasi': {
+      id: '/notifikasi'
+      path: '/notifikasi'
+      fullPath: '/notifikasi'
+      preLoaderRoute: typeof NotifikasiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pendapatan': {
       id: '/pendapatan'
       path: '/pendapatan'
@@ -344,6 +364,7 @@ const rootRouteChildren: RootRouteChildren = {
   JurnalRoute: JurnalRoute,
   KelolaRoute: KelolaRoute,
   LaporanRoute: LaporanRoute,
+  NotifikasiRoute: NotifikasiRoute,
   PendapatanRoute: PendapatanRoute,
   PengeluaranRoute: PengeluaranRoute,
   PenggunaRoute: PenggunaRoute,
