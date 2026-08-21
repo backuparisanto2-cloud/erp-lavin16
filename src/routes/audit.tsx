@@ -49,6 +49,8 @@ const ACTION_LABELS: Record<string, string> = {
   INSERT: "Tambah",
   UPDATE: "Ubah",
   DELETE: "Hapus",
+  LOGIN: "Masuk",
+  LOGOUT: "Keluar",
 };
 
 const EVENT_LABELS: Record<string, string> = {
