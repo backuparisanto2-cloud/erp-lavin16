@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { DoorClosed, Wrench, AlertTriangle, Boxes, Wallet } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
@@ -15,8 +16,15 @@ import {
 } from "@/lib/inventory";
 import { expensesQuery } from "@/lib/expenses";
 import { incomesQuery, otherIncomesQuery } from "@/lib/income";
-import { buildJournal, journalTotals } from "@/lib/journal";
+import {
+  buildJournal,
+  journalTotals,
+  presetRange,
+  JOURNAL_PRESETS,
+  type JournalPreset,
+} from "@/lib/journal";
 import { tenantProfilesQuery } from "@/lib/tenants";
+
 
 
 
