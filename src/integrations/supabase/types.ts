@@ -14,7 +14,248 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      conditions: {
+        Row: {
+          created_at: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      expense_locations: {
+        Row: {
+          created_at: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      expenses: {
+        Row: {
+          amount: number
+          attachments: Json
+          category: string
+          created_at: string
+          dues_contact: string | null
+          dues_name: string | null
+          expense_date: string
+          id: string
+          invoice_no: string | null
+          location: string | null
+          name: string
+          notes: string | null
+          updated_at: string
+          vendor: string | null
+        }
+        Insert: {
+          amount?: number
+          attachments?: Json
+          category?: string
+          created_at?: string
+          dues_contact?: string | null
+          dues_name?: string | null
+          expense_date?: string
+          id?: string
+          invoice_no?: string | null
+          location?: string | null
+          name: string
+          notes?: string | null
+          updated_at?: string
+          vendor?: string | null
+        }
+        Update: {
+          amount?: number
+          attachments?: Json
+          category?: string
+          created_at?: string
+          dues_contact?: string | null
+          dues_name?: string | null
+          expense_date?: string
+          id?: string
+          invoice_no?: string | null
+          location?: string | null
+          name?: string
+          notes?: string | null
+          updated_at?: string
+          vendor?: string | null
+        }
+        Relationships: []
+      }
+      room_items: {
+        Row: {
+          brand: string | null
+          condition: string
+          created_at: string
+          id: string
+          location: string | null
+          name: string
+          notes: string | null
+          photos: Json
+          purchase_date: string | null
+          purchase_price: number | null
+          quantity: number
+          receipts: Json
+          room_id: string
+          serial_number: string | null
+          updated_at: string
+          vendor: string | null
+          warranty_until: string | null
+        }
+        Insert: {
+          brand?: string | null
+          condition?: string
+          created_at?: string
+          id?: string
+          location?: string | null
+          name: string
+          notes?: string | null
+          photos?: Json
+          purchase_date?: string | null
+          purchase_price?: number | null
+          quantity?: number
+          receipts?: Json
+          room_id: string
+          serial_number?: string | null
+          updated_at?: string
+          vendor?: string | null
+          warranty_until?: string | null
+        }
+        Update: {
+          brand?: string | null
+          condition?: string
+          created_at?: string
+          id?: string
+          location?: string | null
+          name?: string
+          notes?: string | null
+          photos?: Json
+          purchase_date?: string | null
+          purchase_price?: number | null
+          quantity?: number
+          receipts?: Json
+          room_id?: string
+          serial_number?: string | null
+          updated_at?: string
+          vendor?: string | null
+          warranty_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_items_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          created_at: string
+          floor: number
+          id: string
+          notes: string | null
+          number: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          floor: number
+          id?: string
+          notes?: string | null
+          number: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          floor?: number
+          id?: string
+          notes?: string | null
+          number?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      shared_items: {
+        Row: {
+          brand: string | null
+          category: string
+          condition: string
+          created_at: string
+          id: string
+          location: string | null
+          name: string
+          notes: string | null
+          photos: Json
+          purchase_date: string | null
+          purchase_price: number | null
+          quantity: number
+          receipts: Json
+          serial_number: string | null
+          updated_at: string
+          vendor: string | null
+          warranty_until: string | null
+        }
+        Insert: {
+          brand?: string | null
+          category?: string
+          condition?: string
+          created_at?: string
+          id?: string
+          location?: string | null
+          name: string
+          notes?: string | null
+          photos?: Json
+          purchase_date?: string | null
+          purchase_price?: number | null
+          quantity?: number
+          receipts?: Json
+          serial_number?: string | null
+          updated_at?: string
+          vendor?: string | null
+          warranty_until?: string | null
+        }
+        Update: {
+          brand?: string | null
+          category?: string
+          condition?: string
+          created_at?: string
+          id?: string
+          location?: string | null
+          name?: string
+          notes?: string | null
+          photos?: Json
+          purchase_date?: string | null
+          purchase_price?: number | null
+          quantity?: number
+          receipts?: Json
+          serial_number?: string | null
+          updated_at?: string
+          vendor?: string | null
+          warranty_until?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
