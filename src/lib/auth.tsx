@@ -3,6 +3,7 @@ import type { Session } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
+import { logAuthEvent } from "@/lib/audit.functions";
 
 export type AppRole = "admin" | "owner" | "finance" | "employee";
 
@@ -48,6 +49,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
       if (event === "SIGNED_IN" || event === "USER_UPDATED") {
         void queryClient.invalidateQueries();
+      }
+      if (event === "SIGNED_IN") {
+        void logAuthEvent({ data: { action: "LOGIN", email: next?.user.email ?? undefined } }).catch(
+          () => undefined,
+        );
       }
       if (event === "SIGNED_OUT") {
         void queryClient.cancelQueries();
@@ -96,6 +102,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       canDelete: privileged,
       canManageUsers: privileged,
       signOut: async () => {
+        await logAuthEvent({
+          data: { action: "LOGOUT", email: session?.user.email ?? undefined },
+        }).catch(() => undefined);
         await supabase.auth.signOut();
       },
     };

@@ -49,10 +49,19 @@ const ACTION_LABELS: Record<string, string> = {
   INSERT: "Tambah",
   UPDATE: "Ubah",
   DELETE: "Hapus",
+  LOGIN: "Masuk",
+  LOGOUT: "Keluar",
+};
+
+const EVENT_LABELS: Record<string, string> = {
+  data: "Perubahan data",
+  auth: "Login / Logout",
 };
 
 type AuditRow = {
   id: string;
+  event_type: string;
+  summary: string | null;
   user_email: string | null;
   table_name: string;
   record_id: string | null;
@@ -69,6 +78,7 @@ function formatWaktu(value: string) {
 }
 
 function AuditPage() {
+  const [eventType, setEventType] = useState("");
   const [table, setTable] = useState("");
   const [action, setAction] = useState("");
   const [user, setUser] = useState("");
@@ -80,7 +90,7 @@ function AuditPage() {
     queryFn: async (): Promise<AuditRow[]> => {
       const { data, error } = await supabase
         .from("audit_logs")
-        .select("id, user_email, table_name, record_id, action, changed_fields, created_at")
+        .select("id, user_email, table_name, record_id, action, changed_fields, created_at, event_type, summary")
         .order("created_at", { ascending: false })
         .limit(1000);
       if (error) throw new Error(error.message);
@@ -90,6 +100,7 @@ function AuditPage() {
 
   const rows = useMemo(() => {
     return (logsQuery.data ?? []).filter((row) => {
+      if (eventType && row.event_type !== eventType) return false;
       if (table && row.table_name !== table) return false;
       if (action && row.action !== action) return false;
       if (user && !(row.user_email ?? "").toLowerCase().includes(user.toLowerCase())) return false;
@@ -98,16 +109,17 @@ function AuditPage() {
       if (to && date > to) return false;
       return true;
     });
-  }, [logsQuery.data, table, action, user, from, to]);
+  }, [logsQuery.data, eventType, table, action, user, from, to]);
 
   function exportCsv() {
-    const header = ["Waktu", "Pengguna", "Data", "Aksi", "ID Data", "Field berubah"];
+    const header = ["Waktu", "Pengguna", "Data", "Aksi", "Peristiwa", "ID Data", "Field berubah"];
     const lines = rows.map((row) =>
       [
         formatWaktu(row.created_at),
         row.user_email ?? "-",
         TABLE_LABELS[row.table_name] ?? row.table_name,
         ACTION_LABELS[row.action] ?? row.action,
+        EVENT_LABELS[row.event_type] ?? row.event_type,
         row.record_id ?? "-",
         Array.isArray(row.changed_fields) ? (row.changed_fields as string[]).join(" ") : "",
       ]
@@ -128,7 +140,23 @@ function AuditPage() {
   return (
     <AppShell title="Audit Log" subtitle="Riwayat perubahan data: siapa, kapan, dan aksinya">
       <div className="space-y-4">
-        <div className="grid gap-3 rounded-lg border border-gold-line bg-card p-4 sm:grid-cols-5">
+        <div className="grid gap-3 rounded-lg border border-gold-line bg-card p-4 sm:grid-cols-6">
+          <div className="space-y-1">
+            <Label htmlFor="f-event">Jenis peristiwa</Label>
+            <select
+              id="f-event"
+              value={eventType}
+              onChange={(e) => setEventType(e.target.value)}
+              className="h-10 w-full rounded-md border border-input bg-background px-2 text-sm"
+            >
+              <option value="">Semua</option>
+              {Object.entries(EVENT_LABELS).map(([key, label]) => (
+                <option key={key} value={key}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="space-y-1">
             <Label htmlFor="f-user">Pengguna</Label>
             <Input id="f-user" value={user} onChange={(e) => setUser(e.target.value)} placeholder="email" />
@@ -190,6 +218,7 @@ function AuditPage() {
                 <th className="px-4 py-3">Pengguna</th>
                 <th className="px-4 py-3">Data</th>
                 <th className="px-4 py-3">Aksi</th>
+                <th className="px-4 py-3">Peristiwa</th>
                 <th className="px-4 py-3">Perubahan</th>
               </tr>
             </thead>
@@ -201,7 +230,12 @@ function AuditPage() {
                   <td className="px-4 py-3">{TABLE_LABELS[row.table_name] ?? row.table_name}</td>
                   <td className="px-4 py-3">{ACTION_LABELS[row.action] ?? row.action}</td>
                   <td className="px-4 py-3 text-xs text-muted-foreground">
-                    {Array.isArray(row.changed_fields) && row.changed_fields.length > 0
+                    {EVENT_LABELS[row.event_type] ?? row.event_type}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-muted-foreground">
+                    {row.summary
+                      ? row.summary
+                      : Array.isArray(row.changed_fields) && row.changed_fields.length > 0
                       ? (row.changed_fields as string[]).join(", ")
                       : "-"}
                   </td>
@@ -209,7 +243,7 @@ function AuditPage() {
               ))}
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-sm text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-6 text-center text-sm text-muted-foreground">
                     Belum ada catatan perubahan.
                   </td>
                 </tr>

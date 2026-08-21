@@ -23,6 +23,8 @@ import {
   LogOut,
   UserCog,
   History,
+  Bell,
+  ShieldCheck,
   Loader2,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
@@ -52,21 +54,23 @@ import { buildCrumbs } from "@/lib/breadcrumbs";
 import { TEXT_SIZES, useTextSize } from "@/lib/text-size";
 import { LoginScreen } from "@/components/LoginScreen";
 import { ROLE_LABELS, useAuth } from "@/lib/auth";
+import { NotificationBell } from "@/components/NotificationBell";
+import { usePermissions, type ModuleKey } from "@/lib/permissions";
 
 const nav = [
-  { to: "/", label: "Ringkasan", icon: LayoutDashboard },
-  { to: "/denah", label: "Denah", icon: Map },
-  { to: "/tenant", label: "Tenant & Pembayaran", icon: Users },
-  { to: "/kelola", label: "Kelola Data", icon: Settings },
-  { to: "/laporan", label: "Laporan", icon: FileBarChart },
-] as const;
+  { to: "/", label: "Ringkasan", icon: LayoutDashboard, module: "dashboard" },
+  { to: "/denah", label: "Denah", icon: Map, module: "denah" },
+  { to: "/tenant", label: "Tenant & Pembayaran", icon: Users, module: "tenant" },
+  { to: "/kelola", label: "Kelola Data", icon: Settings, module: "kelola" },
+  { to: "/laporan", label: "Laporan", icon: FileBarChart, module: "laporan" },
+] as const satisfies readonly { to: string; label: string; icon: typeof Map; module: ModuleKey }[];
 
 
 const accounting = [
-  { to: "/pendapatan", label: "Pendapatan", icon: Coins },
-  { to: "/pengeluaran", label: "Pengeluaran", icon: Wallet },
-  { to: "/jurnal", label: "Jurnal Umum", icon: BookOpen },
-] as const;
+  { to: "/pendapatan", label: "Pendapatan", icon: Coins, module: "pendapatan" },
+  { to: "/pengeluaran", label: "Pengeluaran", icon: Wallet, module: "pengeluaran" },
+  { to: "/jurnal", label: "Jurnal Umum", icon: BookOpen, module: "jurnal" },
+] as const satisfies readonly { to: string; label: string; icon: typeof Coins; module: ModuleKey }[];
 
 const SOP_BASE = "https://lavin-rules-simplified.lovable.app/";
 
@@ -172,7 +176,10 @@ export function AppShell({
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
-  const { loading, session, email, fullName, role, canManageUsers, signOut } = useAuth();
+  const { loading, session, email, fullName, role, signOut } = useAuth();
+  const { can } = usePermissions();
+  const navItems = nav.filter((item) => can(item.module));
+  const accountingItems = accounting.filter((item) => can(item.module));
 
   if (loading) {
     return (
@@ -210,7 +217,7 @@ export function AppShell({
 
           <div className="flex items-center gap-3">
             <nav className="hidden gap-1 md:flex">
-              {nav.map((item) => (
+              {navItems.map((item) => (
                 <Link
                   key={item.to}
                   to={item.to}
@@ -242,7 +249,7 @@ export function AppShell({
                   Akuntansi <ChevronDown className="h-3.5 w-3.5" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  {accounting.map((item) => (
+                  {accountingItems.map((item) => (
                     <DropdownMenuItem key={item.to} asChild>
                       <Link to={item.to} className="flex items-center gap-2">
                         <item.icon className="h-4 w-4" /> {item.label}
@@ -281,19 +288,31 @@ export function AppShell({
                   <p className="truncate text-sm font-medium">{fullName || email}</p>
                   <p className="truncate text-xs text-muted-foreground">{email}</p>
                 </div>
-                {canManageUsers ? (
-                  <>
-                    <DropdownMenuItem asChild>
-                      <Link to="/pengguna" className="flex items-center gap-2">
-                        <UserCog className="h-4 w-4" /> Pengguna
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/audit" className="flex items-center gap-2">
-                        <History className="h-4 w-4" /> Audit Log
-                      </Link>
-                    </DropdownMenuItem>
-                  </>
+                <DropdownMenuItem asChild>
+                  <Link to="/notifikasi" className="flex items-center gap-2">
+                    <Bell className="h-4 w-4" /> Notifikasi
+                  </Link>
+                </DropdownMenuItem>
+                {can("pengguna") ? (
+                  <DropdownMenuItem asChild>
+                    <Link to="/pengguna" className="flex items-center gap-2">
+                      <UserCog className="h-4 w-4" /> Pengguna
+                    </Link>
+                  </DropdownMenuItem>
+                ) : null}
+                {can("akses") ? (
+                  <DropdownMenuItem asChild>
+                    <Link to="/akses" className="flex items-center gap-2">
+                      <ShieldCheck className="h-4 w-4" /> Hak Akses
+                    </Link>
+                  </DropdownMenuItem>
+                ) : null}
+                {can("audit") ? (
+                  <DropdownMenuItem asChild>
+                    <Link to="/audit" className="flex items-center gap-2">
+                      <History className="h-4 w-4" /> Audit Log
+                    </Link>
+                  </DropdownMenuItem>
                 ) : null}
                 <DropdownMenuItem onSelect={() => void signOut()} className="flex items-center gap-2">
                   <LogOut className="h-4 w-4" /> Keluar
@@ -303,6 +322,7 @@ export function AppShell({
             <div className="hidden md:block">
               <TextSizeControl compact />
             </div>
+            <NotificationBell />
             <GuideDialog />
 
             <Sheet open={open} onOpenChange={setOpen}>
@@ -324,7 +344,7 @@ export function AppShell({
                   </SheetDescription>
                 </SheetHeader>
                 <nav className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-2 py-3">
-                  {nav.map((item) => (
+                  {navItems.map((item) => (
                     <Link
                       key={item.to}
                       to={item.to}
@@ -370,7 +390,7 @@ export function AppShell({
                       <ChevronDown className="h-4 w-4 shrink-0 transition-transform" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pl-4">
-                      {accounting.map((item) => (
+                      {accountingItems.map((item) => (
                         <Link
                           key={item.to}
                           to={item.to}
@@ -407,8 +427,15 @@ export function AppShell({
                   </Collapsible>
                 </nav>
                 <div className="shrink-0 space-y-3 border-t border-gold-line px-5 py-4">
-                  {canManageUsers ? (
-                    <div className="flex flex-col">
+                  <div className="flex flex-col">
+                    <Link
+                      to="/notifikasi"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-3 rounded-md px-1 py-2 text-sm text-muted-foreground hover:bg-accent"
+                    >
+                      <Bell className="h-4 w-4" /> Notifikasi
+                    </Link>
+                    {can("pengguna") ? (
                       <Link
                         to="/pengguna"
                         onClick={() => setOpen(false)}
@@ -416,6 +443,17 @@ export function AppShell({
                       >
                         <UserCog className="h-4 w-4" /> Pengguna
                       </Link>
+                    ) : null}
+                    {can("akses") ? (
+                      <Link
+                        to="/akses"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center gap-3 rounded-md px-1 py-2 text-sm text-muted-foreground hover:bg-accent"
+                      >
+                        <ShieldCheck className="h-4 w-4" /> Hak Akses
+                      </Link>
+                    ) : null}
+                    {can("audit") ? (
                       <Link
                         to="/audit"
                         onClick={() => setOpen(false)}
@@ -423,8 +461,8 @@ export function AppShell({
                       >
                         <History className="h-4 w-4" /> Audit Log
                       </Link>
-                    </div>
-                  ) : null}
+                    ) : null}
+                  </div>
                   <TextSizeControl />
                   <div className="border-t border-gold-line pt-3">
                     <p className="truncate text-sm font-medium">{fullName || email}</p>

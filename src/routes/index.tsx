@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { DoorClosed, Wrench, AlertTriangle, Boxes, Wallet } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
@@ -15,8 +16,15 @@ import {
 } from "@/lib/inventory";
 import { expensesQuery } from "@/lib/expenses";
 import { incomesQuery, otherIncomesQuery } from "@/lib/income";
-import { buildJournal, journalTotals } from "@/lib/journal";
+import {
+  buildJournal,
+  journalTotals,
+  presetRange,
+  JOURNAL_PRESETS,
+  type JournalPreset,
+} from "@/lib/journal";
 import { tenantProfilesQuery } from "@/lib/tenants";
+
 
 
 
@@ -77,9 +85,22 @@ function Dashboard() {
   const expenses = useQuery(expensesQuery);
   const tenants = useQuery(tenantProfilesQuery);
 
-  const jurnal = journalTotals(
-    buildJournal(incomes.data ?? [], otherIncomes.data ?? [], expenses.data ?? []),
-  );
+  const [preset, setPreset] = useState<JournalPreset>("bulan-ini");
+  const initial = presetRange("bulan-ini");
+  const [from, setFrom] = useState(initial.from);
+  const [to, setTo] = useState(initial.to);
+
+  const jurnalEntries = useMemo(() => {
+    const all = buildJournal(incomes.data ?? [], otherIncomes.data ?? [], expenses.data ?? []);
+    return all.filter((entry) => {
+      if (from && entry.date < from) return false;
+      if (to && entry.date > to) return false;
+      return true;
+    });
+  }, [incomes.data, otherIncomes.data, expenses.data, from, to]);
+
+  const jurnal = journalTotals(jurnalEntries);
+
 
 
   const roomItems = items.data ?? [];
@@ -233,6 +254,55 @@ function Dashboard() {
             Lihat jurnal lengkap
           </Link>
         </div>
+        <div className="mt-3 flex flex-wrap items-end gap-2">
+          {JOURNAL_PRESETS.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => {
+                setPreset(item.key);
+                if (item.key !== "kustom") {
+                  const next = presetRange(item.key);
+                  setFrom(next.from);
+                  setTo(next.to);
+                }
+              }}
+              className={`rounded-md border px-3 py-1.5 text-xs transition-colors ${
+                preset === item.key
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border text-muted-foreground hover:bg-accent"
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+          <label className="flex items-center gap-1 text-xs text-muted-foreground">
+            Dari
+            <input
+              type="date"
+              value={from}
+              onChange={(e) => {
+                setPreset("kustom");
+                setFrom(e.target.value);
+              }}
+              className="h-9 rounded-md border border-input bg-background px-2 text-xs"
+            />
+          </label>
+          <label className="flex items-center gap-1 text-xs text-muted-foreground">
+            Sampai
+            <input
+              type="date"
+              value={to}
+              onChange={(e) => {
+                setPreset("kustom");
+                setTo(e.target.value);
+              }}
+              className="h-9 rounded-md border border-input bg-background px-2 text-xs"
+            />
+          </label>
+          <span className="text-xs text-muted-foreground">{jurnalEntries.length} transaksi</span>
+        </div>
+
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div className="rounded-lg border border-gold-line px-4 py-3">
             <p className="text-[11px] tracking-[0.14em] text-muted-foreground uppercase">

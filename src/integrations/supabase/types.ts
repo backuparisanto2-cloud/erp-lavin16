@@ -19,10 +19,12 @@ export type Database = {
           action: string
           changed_fields: Json
           created_at: string
+          event_type: string
           id: string
           new_data: Json | null
           old_data: Json | null
           record_id: string | null
+          summary: string | null
           table_name: string
           user_email: string | null
           user_id: string | null
@@ -31,10 +33,12 @@ export type Database = {
           action: string
           changed_fields?: Json
           created_at?: string
+          event_type?: string
           id?: string
           new_data?: Json | null
           old_data?: Json | null
           record_id?: string | null
+          summary?: string | null
           table_name: string
           user_email?: string | null
           user_id?: string | null
@@ -43,10 +47,12 @@ export type Database = {
           action?: string
           changed_fields?: Json
           created_at?: string
+          event_type?: string
           id?: string
           new_data?: Json | null
           old_data?: Json | null
           record_id?: string | null
+          summary?: string | null
           table_name?: string
           user_email?: string | null
           user_id?: string | null
@@ -202,6 +208,62 @@ export type Database = {
           },
         ]
       }
+      notification_reads: {
+        Row: {
+          notification_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          notification_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          notification_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_reads_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          link: string | null
+          message: string
+          title: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          link?: string | null
+          message?: string
+          title: string
+          type?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          link?: string | null
+          message?: string
+          title?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       other_incomes: {
         Row: {
           amount: number
@@ -261,6 +323,42 @@ export type Database = {
           email?: string | null
           full_name?: string
           id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      role_permissions: {
+        Row: {
+          can_create: boolean
+          can_delete: boolean
+          can_update: boolean
+          can_view: boolean
+          created_at: string
+          id: string
+          module: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+        }
+        Insert: {
+          can_create?: boolean
+          can_delete?: boolean
+          can_update?: boolean
+          can_view?: boolean
+          created_at?: string
+          id?: string
+          module: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Update: {
+          can_create?: boolean
+          can_delete?: boolean
+          can_update?: boolean
+          can_view?: boolean
+          created_at?: string
+          id?: string
+          module?: string
+          role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
         }
         Relationships: []
@@ -753,6 +851,10 @@ export type Database = {
     }
     Functions: {
       can_delete: { Args: { _user_id: string }; Returns: boolean }
+      has_permission: {
+        Args: { _action: string; _module: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
