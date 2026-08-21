@@ -233,6 +233,55 @@ function Dashboard() {
             Lihat jurnal lengkap
           </Link>
         </div>
+        <div className="mt-3 flex flex-wrap items-end gap-2">
+          {JOURNAL_PRESETS.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => {
+                setPreset(item.key);
+                if (item.key !== "kustom") {
+                  const next = presetRange(item.key);
+                  setFrom(next.from);
+                  setTo(next.to);
+                }
+              }}
+              className={`rounded-md border px-3 py-1.5 text-xs transition-colors ${
+                preset === item.key
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border text-muted-foreground hover:bg-accent"
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+          <label className="flex items-center gap-1 text-xs text-muted-foreground">
+            Dari
+            <input
+              type="date"
+              value={from}
+              onChange={(e) => {
+                setPreset("kustom");
+                setFrom(e.target.value);
+              }}
+              className="h-9 rounded-md border border-input bg-background px-2 text-xs"
+            />
+          </label>
+          <label className="flex items-center gap-1 text-xs text-muted-foreground">
+            Sampai
+            <input
+              type="date"
+              value={to}
+              onChange={(e) => {
+                setPreset("kustom");
+                setTo(e.target.value);
+              }}
+              className="h-9 rounded-md border border-input bg-background px-2 text-xs"
+            />
+          </label>
+          <span className="text-xs text-muted-foreground">{jurnalEntries.length} transaksi</span>
+        </div>
+
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div className="rounded-lg border border-gold-line px-4 py-3">
             <p className="text-[11px] tracking-[0.14em] text-muted-foreground uppercase">
