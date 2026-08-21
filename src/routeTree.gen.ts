@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AksesRouteImport } from './routes/akses'
 import { Route as AuditRouteImport } from './routes/audit'
 import { Route as DenahRouteImport } from './routes/denah'
 import { Route as FasilitasRouteImport } from './routes/fasilitas'
@@ -27,6 +28,11 @@ import { Route as TenantIdRouteImport } from './routes/tenant.$id'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AksesRoute = AksesRouteImport.update({
+  id: '/akses',
+  path: '/akses',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuditRoute = AuditRouteImport.update({
@@ -97,6 +103,7 @@ const TenantIdRoute = TenantIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/akses': typeof AksesRoute
   '/audit': typeof AuditRoute
   '/denah': typeof DenahRoute
   '/fasilitas': typeof FasilitasRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/akses': typeof AksesRoute
   '/audit': typeof AuditRoute
   '/denah': typeof DenahRoute
   '/fasilitas': typeof FasilitasRoute
@@ -130,6 +138,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/akses': typeof AksesRoute
   '/audit': typeof AuditRoute
   '/denah': typeof DenahRoute
   '/fasilitas': typeof FasilitasRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/akses'
     | '/audit'
     | '/denah'
     | '/fasilitas'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/akses'
     | '/audit'
     | '/denah'
     | '/fasilitas'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/akses'
     | '/audit'
     | '/denah'
     | '/fasilitas'
@@ -197,6 +209,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AksesRoute: typeof AksesRoute
   AuditRoute: typeof AuditRoute
   DenahRoute: typeof DenahRoute
   FasilitasRoute: typeof FasilitasRoute
@@ -219,6 +232,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/akses': {
+      id: '/akses'
+      path: '/akses'
+      fullPath: '/akses'
+      preLoaderRoute: typeof AksesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/audit': {
@@ -317,6 +337,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AksesRoute: AksesRoute,
   AuditRoute: AuditRoute,
   DenahRoute: DenahRoute,
   FasilitasRoute: FasilitasRoute,
