@@ -101,9 +101,111 @@ export type Database = {
         }
         Relationships: []
       }
+      incomes: {
+        Row: {
+          amount: number
+          attachments: Json
+          created_at: string
+          end_date: string | null
+          id: string
+          notes: string | null
+          payment_date: string
+          payment_method: string
+          period_months: number
+          period_type: string
+          room_number: string | null
+          start_date: string
+          tenant_id: string
+          tenant_name: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          attachments?: Json
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_method?: string
+          period_months?: number
+          period_type?: string
+          room_number?: string | null
+          start_date?: string
+          tenant_id: string
+          tenant_name: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          attachments?: Json
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_method?: string
+          period_months?: number
+          period_type?: string
+          room_number?: string | null
+          start_date?: string
+          tenant_id?: string
+          tenant_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incomes_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      other_incomes: {
+        Row: {
+          amount: number
+          attachments: Json
+          created_at: string
+          description: string | null
+          id: string
+          income_date: string
+          name: string
+          payer: string | null
+          payment_method: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          attachments?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          income_date?: string
+          name: string
+          payer?: string | null
+          payment_method?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          attachments?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          income_date?: string
+          name?: string
+          payer?: string | null
+          payment_method?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       room_items: {
         Row: {
           brand: string | null
+          code: string | null
           condition: string
           created_at: string
           id: string
@@ -123,6 +225,7 @@ export type Database = {
         }
         Insert: {
           brand?: string | null
+          code?: string | null
           condition?: string
           created_at?: string
           id?: string
@@ -142,6 +245,7 @@ export type Database = {
         }
         Update: {
           brand?: string | null
+          code?: string | null
           condition?: string
           created_at?: string
           id?: string
@@ -200,6 +304,7 @@ export type Database = {
         Row: {
           brand: string | null
           category: string
+          code: string | null
           condition: string
           created_at: string
           id: string
@@ -219,6 +324,7 @@ export type Database = {
         Insert: {
           brand?: string | null
           category?: string
+          code?: string | null
           condition?: string
           created_at?: string
           id?: string
@@ -238,6 +344,7 @@ export type Database = {
         Update: {
           brand?: string | null
           category?: string
+          code?: string | null
           condition?: string
           created_at?: string
           id?: string
@@ -253,6 +360,39 @@ export type Database = {
           updated_at?: string
           vendor?: string | null
           warranty_until?: string | null
+        }
+        Relationships: []
+      }
+      tenants: {
+        Row: {
+          contact: string | null
+          created_at: string
+          id: string
+          name: string
+          notes: string | null
+          room_number: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          contact?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          notes?: string | null
+          room_number?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          contact?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          room_number?: string | null
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
