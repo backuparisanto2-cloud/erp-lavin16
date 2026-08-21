@@ -77,9 +77,22 @@ function Dashboard() {
   const expenses = useQuery(expensesQuery);
   const tenants = useQuery(tenantProfilesQuery);
 
-  const jurnal = journalTotals(
-    buildJournal(incomes.data ?? [], otherIncomes.data ?? [], expenses.data ?? []),
-  );
+  const [preset, setPreset] = useState<JournalPreset>("bulan-ini");
+  const initial = presetRange("bulan-ini");
+  const [from, setFrom] = useState(initial.from);
+  const [to, setTo] = useState(initial.to);
+
+  const jurnalEntries = useMemo(() => {
+    const all = buildJournal(incomes.data ?? [], otherIncomes.data ?? [], expenses.data ?? []);
+    return all.filter((entry) => {
+      if (from && entry.date < from) return false;
+      if (to && entry.date > to) return false;
+      return true;
+    });
+  }, [incomes.data, otherIncomes.data, expenses.data, from, to]);
+
+  const jurnal = journalTotals(jurnalEntries);
+
 
 
   const roomItems = items.data ?? [];
